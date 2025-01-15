@@ -1,10 +1,6 @@
-variable "NODE_VERSION" {
-  default = "12"
-}
-
-target "node-version" {
+target "_common" {
   args = {
-    NODE_VERSION = NODE_VERSION
+    BUILDKIT_CONTEXT_KEEP_GIT_DIR = 1
   }
 }
 
@@ -13,58 +9,58 @@ group "default" {
 }
 
 group "pre-checkin" {
-  targets = ["vendor-update", "format", "build"]
+  targets = ["vendor", "format", "build"]
 }
 
 group "validate" {
-  targets = ["format-validate", "build-validate", "vendor-validate"]
+  targets = ["lint", "build-validate", "vendor-validate"]
 }
 
 target "build" {
-  inherits = ["node-version"]
-  dockerfile = "./hack/build.Dockerfile"
+  inherits = ["_common"]
+  dockerfile = "dev.Dockerfile"
   target = "build-update"
   output = ["."]
 }
 
 target "build-validate" {
-  inherits = ["node-version"]
-  dockerfile = "./hack/build.Dockerfile"
+  inherits = ["_common"]
+  dockerfile = "dev.Dockerfile"
   target = "build-validate"
   output = ["type=cacheonly"]
 }
 
 target "format" {
-  inherits = ["node-version"]
-  dockerfile = "./hack/build.Dockerfile"
+  inherits = ["_common"]
+  dockerfile = "dev.Dockerfile"
   target = "format-update"
   output = ["."]
 }
 
-target "format-validate" {
-  inherits = ["node-version"]
-  dockerfile = "./hack/build.Dockerfile"
-  target = "format-validate"
+target "lint" {
+  inherits = ["_common"]
+  dockerfile = "dev.Dockerfile"
+  target = "lint"
   output = ["type=cacheonly"]
 }
 
-target "vendor-update" {
-  inherits = ["node-version"]
-  dockerfile = "./hack/build.Dockerfile"
+target "vendor" {
+  inherits = ["_common"]
+  dockerfile = "dev.Dockerfile"
   target = "vendor-update"
   output = ["."]
 }
 
 target "vendor-validate" {
-  inherits = ["node-version"]
-  dockerfile = "./hack/build.Dockerfile"
+  inherits = ["_common"]
+  dockerfile = "dev.Dockerfile"
   target = "vendor-validate"
   output = ["type=cacheonly"]
 }
 
 target "test" {
-  inherits = ["node-version"]
-  dockerfile = "./hack/build.Dockerfile"
+  inherits = ["_common"]
+  dockerfile = "dev.Dockerfile"
   target = "test-coverage"
   output = ["./coverage"]
 }
